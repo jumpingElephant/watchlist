@@ -7,7 +7,8 @@ import java.io.File
 import java.util.*
 
 fun getWatchlistFile(): File {
-    val fileLocation = File("~/.watchlist/")
+    val userHome = System.getProperty("user.home")
+    val fileLocation = File("$userHome/.watchlist/")
     val file = File(fileLocation, "watchlist.dat")
     if (!fileLocation.exists()) {
         fileLocation.mkdirs()
@@ -20,7 +21,7 @@ class WatchlistRepository {
     private val db = nitrite {
         compress = false
         autoCommit = true
-//        file = getWatchlistFile()
+        file = getWatchlistFile()
     }
 
     constructor() {
