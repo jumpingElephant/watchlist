@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.runtime.Composable
 import io.ar.invest.theme.DarkColorPalette
+import io.ar.invest.ui.WatchlistBody
 
 val watchlistRepository = LocalWatchlistRepository
 val stockRepository = LocalStockRepository
@@ -61,8 +62,10 @@ fun Watchlist() {
             }
         ) {
             Column {
+                val current = watchlistRepository.current
                 WatchlistBody(
-                    stocks = watchlistRepository.current.getWatchlist()
+                    watchlist = watchlistRepository.current.getWatchlist(),
+                    updateWatchlistEntry = { current.updateWatchlistEntry(it) }
                 )
             }
         }

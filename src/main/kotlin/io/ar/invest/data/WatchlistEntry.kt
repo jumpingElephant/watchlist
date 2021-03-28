@@ -5,7 +5,6 @@ import java.util.*
 
 data class WatchlistEntry(
     @Id val id: UUID,
-    val name: String,
-    val isin: String,
-    val wkn: String
+    val stock: Stock,
+    val graphDisplayed: Boolean = false
 )

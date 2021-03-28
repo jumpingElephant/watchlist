@@ -24,7 +24,12 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.dizitart:nitrite:3.4.3")
     implementation("org.dizitart:potassium-nitrite:3.4.3")
-    implementation("org.jetbrains.compose.material:material-icons-extended:$compose_version")
+    api(compose.runtime)
+    api(compose.foundation)
+    api(compose.material)
+    api(compose.materialIconsExtended)
+    api(compose.desktop.common)
+    api(compose.ui)
 }
 
 tasks.test {

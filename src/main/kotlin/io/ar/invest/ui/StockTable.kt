@@ -1,3 +1,5 @@
+package io.ar.invest.ui
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -24,18 +26,22 @@ import io.ar.invest.theme.divider
 
 @Composable
 fun WatchlistBody(
-    stocks: List<WatchlistEntry>
+    watchlist: List<WatchlistEntry>,
+    updateWatchlistEntry: (WatchlistEntry) -> Unit
 ) {
     LazyColumn {
         items(
-            items = stocks,
-            key = { it::isin }
+            items = watchlist,
+            key = { it.id }
         ) {
-            var (graphDisplayed, onGraphDisplayedChange) = remember { mutableStateOf(false) }
+            var (graphDisplayed, onGraphDisplayedChange) = remember { mutableStateOf(it.graphDisplayed) }
             WatchlistItem(
                 item = it,
                 graphDisplayed = graphDisplayed,
-                onGraphDisplayedChange = onGraphDisplayedChange
+                onGraphDisplayedChange = { graphDisplayed ->
+                    updateWatchlistEntry(it.copy(graphDisplayed = graphDisplayed))
+                    onGraphDisplayedChange(graphDisplayed)
+                }
             )
         }
     }
@@ -55,11 +61,11 @@ fun WatchlistItem(
             .padding(horizontal = 20.dp, vertical = 9.dp)
     ) {
         Column {
-            Text(text = item.name)
+            Text(text = item.stock.name)
             Row(modifier = Modifier.padding(top = 3.dp)) {
-                Text("ISIN: ${item.isin}", style = MaterialTheme.typography.overline)
+                Text("ISIN: ${item.stock.isin}", style = MaterialTheme.typography.overline)
                 Spacer(modifier = Modifier.width(7.dp))
-                Text("WKN: ${item.wkn}", style = MaterialTheme.typography.overline)
+                Text("WKN: ${item.stock.wkn}", style = MaterialTheme.typography.overline)
             }
         }
         IconButton(
