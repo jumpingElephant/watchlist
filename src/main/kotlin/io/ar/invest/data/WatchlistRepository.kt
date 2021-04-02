@@ -24,7 +24,7 @@ class WatchlistRepository {
         file = getWatchlistFile()
     }
 
-    constructor() {
+    init {
         val watchlistEntries = watchlistObjectRepository()
         if (watchlistEntries.find().count() <= 0) {
             listOf(
@@ -49,9 +49,9 @@ class WatchlistRepository {
     fun getWatchlist(wkn: String? = null): List<WatchlistEntry> {
         val watchlistEntries = watchlistObjectRepository()
         return if (wkn == null) {
-            watchlistEntries.find().toList()
+            watchlistEntries.find().sortedBy { it.stock.name }.toList()
         } else {
-            watchlistEntries.find(ObjectFilters.eq("wkn", wkn)).toList()
+            watchlistEntries.find(ObjectFilters.eq("wkn", wkn)).sortedBy { it.stock.name }.toList()
         }
     }
 
