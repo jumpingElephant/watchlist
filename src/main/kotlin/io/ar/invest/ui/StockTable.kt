@@ -1,6 +1,7 @@
 package io.ar.invest.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,13 +16,13 @@ import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Addchart
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.ShoppingBasket
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
 import io.ar.invest.data.WatchlistEntry
+import io.ar.invest.theme.WatchlistColors
 import io.ar.invest.theme.divider
 
 @Composable
@@ -34,13 +35,13 @@ fun WatchlistBody(
             items = watchlist,
             key = { it.id }
         ) {
-            var (graphDisplayed, onGraphDisplayedChange) = remember { mutableStateOf(it.graphDisplayed) }
+            val (graphDisplayed, onGraphDisplayedChange) = remember { mutableStateOf(it.graphDisplayed) }
             WatchlistItem(
                 item = it,
                 graphDisplayed = graphDisplayed,
-                onGraphDisplayedChange = { graphDisplayed ->
-                    updateWatchlistEntry(it.copy(graphDisplayed = graphDisplayed))
-                    onGraphDisplayedChange(graphDisplayed)
+                onGraphDisplayedChange = { newValue ->
+                    updateWatchlistEntry(it.copy(graphDisplayed = newValue))
+                    onGraphDisplayedChange(newValue)
                 }
             )
         }
@@ -53,12 +54,15 @@ fun WatchlistItem(
     graphDisplayed: Boolean = false,
     onGraphDisplayedChange: (Boolean) -> Unit
 ) {
+    var isHighlighted by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 0.dp)
             .border(border = BorderStroke(1.dp, color = divider), shape = CutCornerShape(2.dp))
+            .background(color = if (isHighlighted) WatchlistColors.reactionBg else Color.Transparent)
             .padding(horizontal = 20.dp, vertical = 9.dp)
+            .pointerMoveFilter(onEnter = { isHighlighted = true; false }, onExit = { isHighlighted = false;false })
     ) {
         Column {
             Text(text = item.stock.name)
