@@ -32,12 +32,18 @@ class WatchlistRepository {
                     stock = Stock(
                         name = "International Business Machines Corporation",
                         isin = "US4592001014",
-                        wkn = "851399"
+                        wkn = "851399",
+                        stockType = "Aktie"
                     ),
                     id = UUID.randomUUID()
                 ),
                 WatchlistEntry(
-                    stock = Stock(name = "Deutsche Telekom", isin = "DE0005557508", wkn = "555750"),
+                    stock = Stock(
+                        name = "Deutsche Telekom",
+                        isin = "DE0005557508",
+                        wkn = "555750",
+                        stockType = "Aktie"
+                    ),
                     id = UUID.randomUUID()
                 )
             ).forEach {

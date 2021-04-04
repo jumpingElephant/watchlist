@@ -1,4 +1,5 @@
 import androidx.compose.desktop.Window
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -9,9 +10,10 @@ import io.ar.invest.data.WatchlistRepository
 val LocalWatchlistRepository = compositionLocalOf<WatchlistRepository> { error("No Watchlist found!") }
 val LocalStockRepository = compositionLocalOf<StockRepository> { error("No Stocks found!") }
 
+@ExperimentalMaterialApi
 fun main() = Window(
     title = "Watchlist",
-    size = IntSize(1440, 768)
+    size = IntSize(962, 768)
 ) {
     val cache = StockRepository
     val watchlist = WatchlistRepository()

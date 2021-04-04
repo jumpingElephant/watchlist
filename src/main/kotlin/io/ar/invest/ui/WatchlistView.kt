@@ -10,6 +10,7 @@ import io.ar.invest.ui.WatchlistBody
 val watchlistRepository = LocalWatchlistRepository
 val stockRepository = LocalStockRepository
 
+@ExperimentalMaterialApi
 @Composable
 fun WatchlistView() {
     MaterialTheme(
@@ -21,6 +22,7 @@ fun WatchlistView() {
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun Main() {
     Scaffold(
@@ -46,6 +48,7 @@ fun Main() {
     )
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun Watchlist() {
     Column {
