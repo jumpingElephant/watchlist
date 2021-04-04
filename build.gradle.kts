@@ -10,7 +10,7 @@ plugins {
 group = "io.ar.invest"
 version = "1.0"
 
-val compose_version = "0.3.2"
+val composeVersion = "0.4.0-build178"
 
 repositories {
     jcenter()
