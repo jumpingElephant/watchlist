@@ -1,10 +1,8 @@
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.runtime.Composable
-import io.ar.invest.theme.DarkColorPalette
 import io.ar.invest.ui.WatchlistBody
 
 val watchlistRepository = LocalWatchlistRepository
@@ -13,18 +11,6 @@ val stockRepository = LocalStockRepository
 @ExperimentalMaterialApi
 @Composable
 fun WatchlistView() {
-    MaterialTheme(
-        colors = DarkColorPalette
-    ) {
-        DisableSelection {
-            Main()
-        }
-    }
-}
-
-@ExperimentalMaterialApi
-@Composable
-fun Main() {
     Scaffold(
         topBar = {
             TopAppBar(
