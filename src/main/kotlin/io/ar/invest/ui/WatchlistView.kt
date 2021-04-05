@@ -1,9 +1,12 @@
+package io.ar.invest.ui
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.runtime.Composable
-import io.ar.invest.ui.WatchlistBody
+import io.ar.invest.LocalStockRepository
+import io.ar.invest.LocalWatchlistRepository
 
 val watchlistRepository = LocalWatchlistRepository
 val stockRepository = LocalStockRepository

@@ -1,5 +1,3 @@
 package io.ar.invest.data
 
-object StockRepository {
-
-}
+object StockRepository
