@@ -1,5 +1,6 @@
 package io.ar.invest.data
 
+import io.ar.invest.getUserHome
 import org.dizitart.kno2.getRepository
 import org.dizitart.kno2.nitrite
 import org.dizitart.no2.objects.filters.ObjectFilters
@@ -7,7 +8,7 @@ import java.io.File
 import java.util.*
 
 fun getWatchlistFile(): File {
-    val userHome = System.getProperty("user.home")
+    val userHome = getUserHome()
     val fileLocation = File("$userHome/.watchlist/")
     val file = File(fileLocation, "watchlist.dat")
     if (!fileLocation.exists()) {
