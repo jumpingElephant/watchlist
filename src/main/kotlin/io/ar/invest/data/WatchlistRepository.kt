@@ -56,9 +56,9 @@ class WatchlistRepository {
     fun getWatchlist(wkn: String? = null): List<WatchlistEntry> {
         val watchlistEntries = watchlistObjectRepository()
         return if (wkn == null) {
-            watchlistEntries.find().sortedBy { it.stock.name }.toList()
+            watchlistEntries.find().sortedBy { it.stock.name.toLowerCase() }.toList()
         } else {
-            watchlistEntries.find(ObjectFilters.eq("wkn", wkn)).sortedBy { it.stock.name }.toList()
+            watchlistEntries.find(ObjectFilters.eq("wkn", wkn)).sortedBy { it.stock.name.toLowerCase() }.toList()
         }
     }
 
