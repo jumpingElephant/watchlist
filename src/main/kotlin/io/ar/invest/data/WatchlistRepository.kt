@@ -67,4 +67,18 @@ class WatchlistRepository {
     fun updateWatchlistEntry(entry: WatchlistEntry) {
         watchlistObjectRepository().update(entry)
     }
+
+    fun deleteWatchlistEntry(entry: WatchlistEntry) {
+        watchlistObjectRepository().remove(ObjectFilters.eq("id", entry.id))
+    }
+
+    fun insertWatchlistEntry(stock: Stock) {
+        watchlistObjectRepository()
+            .insert(
+                WatchlistEntry(
+                    stock = stock,
+                    id = UUID.randomUUID()
+                )
+            )
+    }
 }

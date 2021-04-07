@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import io.ar.invest.LocalApplicationProperties
 import io.ar.invest.LocalStockRepository
 import io.ar.invest.LocalWatchlistRepository
+import io.ar.invest.data.Stock
 import io.ar.invest.data.WatchlistMode
 
 val watchlistRepository = LocalWatchlistRepository
@@ -51,20 +52,24 @@ fun WatchlistView() {
 fun Watchlist() {
     val appState = applicationProperties.current
     var mode by remember { mutableStateOf(appState.getWatchlistMode()) }
+    fun switchMode(watchlistMode: WatchlistMode) {
+        mode = watchlistMode
+        appState.setWatchlistMode(mode)
+    }
     Column {
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text("Stocks") },
                     actions = {
-                        Button(onClick =
-                        {
-                            mode = when (mode) {
-                                WatchlistMode.Listing -> WatchlistMode.Creating
-                                WatchlistMode.Creating -> WatchlistMode.Listing
-                            }
-                            appState.setWatchlistMode(mode)
-                        }) {
+                        Button(
+                            onClick =
+                            {
+                                when (mode) {
+                                    WatchlistMode.Listing -> switchMode(WatchlistMode.Creating)
+                                    WatchlistMode.Creating -> switchMode(WatchlistMode.Listing)
+                                }
+                            }) {
                             Text(
                                 text = when (mode) {
                                     WatchlistMode.Listing -> "Add"
@@ -80,9 +85,14 @@ fun Watchlist() {
                 val repository = watchlistRepository.current
                 when (mode) {
                     WatchlistMode.Listing -> {
+                        var watchlist by remember { mutableStateOf(repository.getWatchlist()) }
                         WatchlistBody(
-                            watchlist = watchlistRepository.current.getWatchlist(),
-                            updateWatchlistEntry = { repository.updateWatchlistEntry(it) }
+                            watchlist = watchlist,
+                            updateWatchlistEntry = { repository.updateWatchlistEntry(it) },
+                            deleteWatchlistEntry = {
+                                repository.deleteWatchlistEntry(it)
+                                watchlist = repository.getWatchlist()
+                            }
                         )
                     }
                     WatchlistMode.Creating -> {
@@ -93,7 +103,7 @@ fun Watchlist() {
                             FormTextField(
                                 value = name,
                                 onValueChange = onNameChange,
-                                label = { Text("name") }
+                                label = { Text("Name") }
                             )
                             FormTextField(
                                 value = isin,
@@ -110,7 +120,12 @@ fun Watchlist() {
                                 modifier = Modifier
                                     .wrapContentSize()
                             ) {
-                                Button(onClick = {}) { Text("Create") }
+                                Button(onClick = {
+                                    repository.insertWatchlistEntry(Stock(name, isin, wkn, "Aktie"))
+                                    switchMode(WatchlistMode.Listing)
+                                }) {
+                                    Text("Create")
+                                }
                             }
                         }
                     }

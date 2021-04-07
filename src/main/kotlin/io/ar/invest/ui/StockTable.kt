@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Addchart
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +24,8 @@ import io.ar.invest.theme.WatchlistColors
 @Composable
 fun WatchlistBody(
     watchlist: List<WatchlistEntry>,
-    updateWatchlistEntry: (WatchlistEntry) -> Unit
+    updateWatchlistEntry: (WatchlistEntry) -> Unit,
+    deleteWatchlistEntry: (WatchlistEntry) -> Unit
 ) {
     LazyColumn {
         items(
@@ -37,6 +39,9 @@ fun WatchlistBody(
                 onGraphDisplayedChange = { newValue ->
                     updateWatchlistEntry(it.copy(graphDisplayed = newValue))
                     onGraphDisplayedChange(newValue)
+                },
+                onDelete = {
+                    deleteWatchlistEntry(it)
                 }
             )
             Divider()
@@ -49,7 +54,8 @@ fun WatchlistBody(
 fun WatchlistItem(
     item: WatchlistEntry,
     graphDisplayed: Boolean = false,
-    onGraphDisplayedChange: (Boolean) -> Unit
+    onGraphDisplayedChange: (Boolean) -> Unit,
+    onDelete: () -> Unit
 ) {
     var isHighlighted by remember { mutableStateOf(false) }
     ListItem(
@@ -63,17 +69,29 @@ fun WatchlistItem(
         },
         overlineText = { Text(item.stock.stockType) },
         trailing = {
-            IconButton(
-                onClick = {
-                    onGraphDisplayedChange(graphDisplayed.not())
-                },
-            ) {
-                Icon(
-                    imageVector = if (graphDisplayed) Icons.Default.BarChart else Icons.Default.Addchart,
-                    tint = Color.White,
-                    contentDescription = "Add to chart",
-                    modifier = Modifier
-                )
+            Row {
+                IconButton(
+                    onClick = {
+                        onGraphDisplayedChange(graphDisplayed.not())
+                    },
+                ) {
+                    Icon(
+                        imageVector = if (graphDisplayed) Icons.Default.BarChart else Icons.Default.Addchart,
+                        tint = Color.White,
+                        contentDescription = "Add to chart",
+                        modifier = Modifier
+                    )
+                }
+                IconButton(
+                    onClick = { onDelete() },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        tint = Color.White,
+                        contentDescription = "Delete",
+                        modifier = Modifier
+                    )
+                }
             }
         },
         modifier = Modifier
