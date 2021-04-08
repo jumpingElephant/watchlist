@@ -4,13 +4,10 @@ import io.ar.invest.getUserHome
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.*
 
 enum class WatchlistMode {
-    Listing, Creating
+    Creating, Listing, Editing
 }
 
 fun getPropertyFile(): File {
@@ -46,12 +43,6 @@ class ApplicationProperties {
 
     fun setWatchlistMode(watchlistMode: WatchlistMode) {
         properties.setProperty(watchlistModeKey, watchlistMode.toString())
-        properties.store(FileOutputStream(getPropertyFile()), createFileComment())
+        properties.store(FileOutputStream(getPropertyFile()), "Watchlist Properties")
     }
-
-    private fun createFileComment() = LocalDateTime.now().format(
-        DateTimeFormatter.ofLocalizedDateTime(
-            FormatStyle.LONG, FormatStyle.SHORT
-        )
-    )
 }

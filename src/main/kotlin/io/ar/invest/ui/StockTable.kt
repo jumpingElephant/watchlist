@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Addchart
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import io.ar.invest.theme.WatchlistColors
 fun WatchlistBody(
     watchlist: List<WatchlistEntry>,
     updateWatchlistEntry: (WatchlistEntry) -> Unit,
+    editWatchlistEntry: (WatchlistEntry) -> Unit,
     deleteWatchlistEntry: (WatchlistEntry) -> Unit
 ) {
     LazyColumn {
@@ -39,6 +41,9 @@ fun WatchlistBody(
                 onGraphDisplayedChange = { newValue ->
                     updateWatchlistEntry(it.copy(graphDisplayed = newValue))
                     onGraphDisplayedChange(newValue)
+                },
+                onEdit = {
+                    editWatchlistEntry(it)
                 },
                 onDelete = {
                     deleteWatchlistEntry(it)
@@ -55,6 +60,7 @@ fun WatchlistItem(
     item: WatchlistEntry,
     graphDisplayed: Boolean = false,
     onGraphDisplayedChange: (Boolean) -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     var isHighlighted by remember { mutableStateOf(false) }
@@ -79,6 +85,16 @@ fun WatchlistItem(
                         imageVector = if (graphDisplayed) Icons.Default.BarChart else Icons.Default.Addchart,
                         tint = Color.White,
                         contentDescription = "Add to chart",
+                        modifier = Modifier
+                    )
+                }
+                IconButton(
+                    onClick = { onEdit() },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        tint = Color.White,
+                        contentDescription = "Edit",
                         modifier = Modifier
                     )
                 }

@@ -13,6 +13,7 @@ import io.ar.invest.LocalApplicationProperties
 import io.ar.invest.LocalStockRepository
 import io.ar.invest.LocalWatchlistRepository
 import io.ar.invest.data.Stock
+import io.ar.invest.data.WatchlistEntry
 import io.ar.invest.data.WatchlistMode
 
 val watchlistRepository = LocalWatchlistRepository
@@ -51,7 +52,15 @@ fun WatchlistView() {
 @Composable
 fun Watchlist() {
     val appState = applicationProperties.current
-    var mode by remember { mutableStateOf(appState.getWatchlistMode()) }
+    var mode by remember {
+        mutableStateOf(
+            when (appState.getWatchlistMode()) {
+                WatchlistMode.Editing -> WatchlistMode.Listing
+                else -> appState.getWatchlistMode()
+            }
+        )
+    }
+    var editedWatchlistEntry: WatchlistEntry? = null
     fun switchMode(watchlistMode: WatchlistMode) {
         mode = watchlistMode
         appState.setWatchlistMode(mode)
@@ -62,26 +71,34 @@ fun Watchlist() {
                 TopAppBar(
                     title = { Text("Stocks") },
                     actions = {
-                        Button(
-                            onClick =
-                            {
-                                when (mode) {
-                                    WatchlistMode.Listing -> switchMode(WatchlistMode.Creating)
-                                    WatchlistMode.Creating -> switchMode(WatchlistMode.Listing)
+                        when (mode) {
+                            WatchlistMode.Creating ->
+                                Button(
+                                    onClick = { switchMode(WatchlistMode.Listing) }
+                                ) {
+                                    Text(text = "Show list")
                                 }
-                            }) {
-                            Text(
-                                text = when (mode) {
-                                    WatchlistMode.Listing -> "Add"
-                                    WatchlistMode.Creating -> "Show list"
+                            WatchlistMode.Listing ->
+                                Button(
+                                    onClick = { switchMode(WatchlistMode.Creating) }
+                                ) {
+                                    Text(text = "Add")
                                 }
-                            )
+                            WatchlistMode.Editing ->
+                                Button(
+                                    onClick = {
+                                        switchMode(WatchlistMode.Listing)
+                                        editedWatchlistEntry = null
+                                    }
+                                ) {
+                                    Text(text = "Cancel")
+                                }
                         }
                     }
                 )
             }
         ) {
-            Column() {
+            Column {
                 val repository = watchlistRepository.current
                 when (mode) {
                     WatchlistMode.Listing -> {
@@ -89,6 +106,10 @@ fun Watchlist() {
                         WatchlistBody(
                             watchlist = watchlist,
                             updateWatchlistEntry = { repository.updateWatchlistEntry(it) },
+                            editWatchlistEntry = {
+                                switchMode(WatchlistMode.Editing)
+                                editedWatchlistEntry = it
+                            },
                             deleteWatchlistEntry = {
                                 repository.deleteWatchlistEntry(it)
                                 watchlist = repository.getWatchlist()
@@ -99,37 +120,74 @@ fun Watchlist() {
                         val (name, onNameChange) = remember { mutableStateOf("") }
                         val (isin, onIsinChange) = remember { mutableStateOf("") }
                         val (wkn, onWknChange) = remember { mutableStateOf("") }
-                        Column {
-                            FormTextField(
-                                value = name,
-                                onValueChange = onNameChange,
-                                label = { Text("Name") }
-                            )
-                            FormTextField(
-                                value = isin,
-                                onValueChange = onIsinChange,
-                                label = { Text("ISIN") }
-                            )
-                            FormTextField(
-                                value = wkn,
-                                onValueChange = onWknChange,
-                                label = { Text("WKN") }
-                            )
-                            Row(
-                                horizontalArrangement = Arrangement.End,
-                                modifier = Modifier
-                                    .wrapContentSize()
-                            ) {
-                                Button(onClick = {
-                                    repository.insertWatchlistEntry(Stock(name, isin, wkn, "Aktie"))
-                                    switchMode(WatchlistMode.Listing)
-                                }) {
-                                    Text("Create")
-                                }
+                        StockForm(
+                            submitText = "Create",
+                            name = name, onNameChange = onNameChange,
+                            isin = isin, onIsinChange = onIsinChange,
+                            wkn = wkn, onWknChange = onWknChange,
+                            onSubmit = {
+                                repository.insertWatchlistEntry(Stock(name, isin, wkn, "Aktie"))
+                                switchMode(WatchlistMode.Listing)
                             }
-                        }
+                        )
+                    }
+                    WatchlistMode.Editing -> {
+                        val (name, onNameChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.name) }
+                        val (isin, onIsinChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.isin) }
+                        val (wkn, onWknChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.wkn) }
+                        StockForm(
+                            submitText = "Update",
+                            name = name, onNameChange = onNameChange,
+                            isin = isin, onIsinChange = onIsinChange,
+                            wkn = wkn, onWknChange = onWknChange,
+                            onSubmit = {
+                                repository.updateWatchlistEntry(
+                                    editedWatchlistEntry!!.copy(stock = Stock(name, isin, wkn, "Aktie"))
+                                )
+                                switchMode(WatchlistMode.Listing)
+                            }
+                        )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StockForm(
+    name: String,
+    onNameChange: (String) -> Unit,
+    isin: String,
+    onIsinChange: (String) -> Unit,
+    wkn: String,
+    onWknChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    submitText: String
+) {
+    Column {
+        FormTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = { Text("Name") }
+        )
+        FormTextField(
+            value = isin,
+            onValueChange = onIsinChange,
+            label = { Text("ISIN") }
+        )
+        FormTextField(
+            value = wkn,
+            onValueChange = onWknChange,
+            label = { Text("WKN") }
+        )
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .wrapContentSize()
+        ) {
+            Button(onClick = onSubmit) {
+                Text(submitText)
             }
         }
     }
