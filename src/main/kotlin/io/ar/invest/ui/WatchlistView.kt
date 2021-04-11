@@ -12,9 +12,7 @@ import androidx.compose.ui.Modifier
 import io.ar.invest.LocalApplicationProperties
 import io.ar.invest.LocalStockRepository
 import io.ar.invest.LocalWatchlistRepository
-import io.ar.invest.data.Stock
-import io.ar.invest.data.WatchlistEntry
-import io.ar.invest.data.WatchlistMode
+import io.ar.invest.data.*
 
 val watchlistRepository = LocalWatchlistRepository
 val applicationProperties = LocalApplicationProperties
@@ -126,15 +124,15 @@ fun Watchlist() {
                             isin = isin, onIsinChange = onIsinChange,
                             wkn = wkn, onWknChange = onWknChange,
                             onSubmit = {
-                                repository.insertWatchlistEntry(Stock(name, isin, wkn, "Aktie"))
+                                repository.insertWatchlistEntry(Stock(name, Isin(isin), Wkn(wkn), "Aktie"))
                                 switchMode(WatchlistMode.Listing)
                             }
                         )
                     }
                     WatchlistMode.Editing -> {
                         val (name, onNameChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.name) }
-                        val (isin, onIsinChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.isin) }
-                        val (wkn, onWknChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.wkn) }
+                        val (isin, onIsinChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.isin.value) }
+                        val (wkn, onWknChange) = remember { mutableStateOf(editedWatchlistEntry!!.stock.wkn.value) }
                         StockForm(
                             submitText = "Update",
                             name = name, onNameChange = onNameChange,
@@ -142,7 +140,7 @@ fun Watchlist() {
                             wkn = wkn, onWknChange = onWknChange,
                             onSubmit = {
                                 repository.updateWatchlistEntry(
-                                    editedWatchlistEntry!!.copy(stock = Stock(name, isin, wkn, "Aktie"))
+                                    editedWatchlistEntry!!.copy(stock = Stock(name, Isin(isin), Wkn(wkn), "Aktie"))
                                 )
                                 switchMode(WatchlistMode.Listing)
                             }

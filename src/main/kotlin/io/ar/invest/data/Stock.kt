@@ -2,17 +2,32 @@ package io.ar.invest.data
 
 data class Stock(
     val name: String,
-    val isin: String,
-    val wkn: String,
+    val isin: Isin,
+    val wkn: Wkn,
     val stockType: String
 )
 
-val isinRegex = Regex("""\A([A-Z]{2})((?![A-Z]{9}\b)[A-Z0-9]{9})[0-9]\Z""")
-fun isValidIsin(isin: String): Boolean {
-    return isinRegex.matches(isin)
+private val wknRegex = Regex("""\A([A-HJ-NP-Z0-9]{6})\Z""")
+private val isinRegex = Regex("""\A([A-Z]{2})((?![A-Z]{9}\b)[A-Z0-9]{9})[0-9]\Z""")
+
+data class Wkn(val value: String) {
+
+    fun isValid(wkn: String): Boolean {
+        return wknRegex.matches(wkn)
+    }
+
+    override fun toString(): String {
+        return value
+    }
 }
 
-val wknRegex = Regex("""\A([A-HJ-NP-Z0-9]{6})\Z""")
-fun isValidWkn(wkn: String): Boolean {
-    return wknRegex.matches(wkn)
+data class Isin(val value: String) {
+
+    fun isValid(): Boolean {
+        return isinRegex.matches(value)
+    }
+
+    override fun toString(): String {
+        return value
+    }
 }

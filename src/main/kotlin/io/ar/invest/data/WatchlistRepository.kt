@@ -3,6 +3,8 @@ package io.ar.invest.data
 import io.ar.invest.getUserHome
 import org.dizitart.kno2.getRepository
 import org.dizitart.kno2.nitrite
+import org.dizitart.no2.Document
+import org.dizitart.no2.objects.ObjectRepository
 import org.dizitart.no2.objects.filters.ObjectFilters
 import java.io.File
 import java.util.*
@@ -26,14 +28,16 @@ class WatchlistRepository {
     }
 
     init {
+        migrateWatchlistEntries()
+
         val watchlistEntries = watchlistObjectRepository()
         if (watchlistEntries.find().count() <= 0) {
             listOf(
                 WatchlistEntry(
                     stock = Stock(
                         name = "International Business Machines Corporation",
-                        isin = "US4592001014",
-                        wkn = "851399",
+                        isin = Isin("US4592001014"),
+                        wkn = Wkn("851399"),
                         stockType = "Aktie"
                     ),
                     id = UUID.randomUUID()
@@ -41,8 +45,8 @@ class WatchlistRepository {
                 WatchlistEntry(
                     stock = Stock(
                         name = "Deutsche Telekom",
-                        isin = "DE0005557508",
-                        wkn = "555750",
+                        isin = Isin("DE0005557508"),
+                        wkn = Wkn("555750"),
                         stockType = "Aktie"
                     ),
                     id = UUID.randomUUID()
@@ -51,6 +55,39 @@ class WatchlistRepository {
                 watchlistEntries.insert(it)
             }
         }
+    }
+
+    private fun migrateWatchlistEntries() {
+        val watchlistEntries = watchlistObjectRepository()
+        migrateIsinStringToObjectType(watchlistEntries)
+        migrateWknStringToObjectType(watchlistEntries)
+        watchlistEntries.find().forEach(watchlistEntries::update)
+    }
+
+    private fun migrateIsinStringToObjectType(watchlistEntries: ObjectRepository<WatchlistEntry>) {
+        watchlistEntries.documentCollection
+            .find()
+            .toList()
+            .map { we -> we.get("stock") as Document }
+            .filter { we -> we.get("isin") is String }
+            .map { stockDocument: Document ->
+                val isinValue = stockDocument.remove("isin") as String
+                stockDocument["isin"] = Document(mapOf(Pair("value", isinValue)))
+                stockDocument
+            }
+    }
+
+    private fun migrateWknStringToObjectType(watchlistEntries: ObjectRepository<WatchlistEntry>) {
+        watchlistEntries.documentCollection
+            .find()
+            .toList()
+            .map { we -> we.get("stock") as Document }
+            .filter { we -> we.get("wkn") is String }
+            .map { stockDocument: Document ->
+                val wknValue = stockDocument.remove("wkn") as String
+                stockDocument["wkn"] = Document(mapOf(Pair("value", wknValue)))
+                stockDocument
+            }
     }
 
     fun getWatchlist(wkn: String? = null): List<WatchlistEntry> {
